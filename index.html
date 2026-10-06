@@ -631,6 +631,40 @@
       display: flex;
     }
 
+    .rep-item {
+      cursor: default;
+    }
+
+    .rep-boxes {
+      display: flex;
+      gap: 6px;
+    }
+
+    .rep-box {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      border: 2px solid #444;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      color: #000;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .rep-box.checked {
+      background: #22c55e;
+      border-color: #22c55e;
+    }
+
+    .rep-box.checked::after {
+      content: '✓';
+    }
+
     .water-item {
       cursor: default;
     }
@@ -700,13 +734,25 @@
           <li class="check-item" data-id="spinach-eggs"><span class="check-box"></span><span class="check-label">Spinach + Eggs</span></li>
           <li class="check-item" data-id="apple"><span class="check-box"></span><span class="check-label">Apple</span></li>
           <li class="check-item" data-id="pickles"><span class="check-box"></span><span class="check-label">Pickles</span></li>
+          <li class="check-item" data-id="honey"><span class="check-box"></span><span class="check-label">Honey</span></li>
+          <li class="check-item" data-id="supplements"><span class="check-box"></span><span class="check-label">Supplements</span></li>
           <li class="check-item" data-id="avocado"><span class="check-box"></span><span class="check-label">Avocado</span></li>
           <li class="check-item" data-id="ginger"><span class="check-box"></span><span class="check-label">Ginger</span></li>
           <li class="check-item" data-id="almonds"><span class="check-box"></span><span class="check-label">Almonds</span></li>
           <li class="check-item" data-id="milk"><span class="check-box"></span><span class="check-label">Milk</span></li>
           <li class="check-item" data-id="meal2"><span class="check-box"></span><span class="check-label">Meal 2</span></li>
           <li class="check-item" data-id="meal3"><span class="check-box"></span><span class="check-label">Meal 3</span></li>
-          <li class="check-item" data-id="gripper"><span class="check-box"></span><span class="check-label">Gripper</span></li>
+          <li class="check-item" data-id="broccoli"><span class="check-box"></span><span class="check-label">Broccoli</span></li>
+          <li class="check-item rep-item" data-id="gripper">
+            <span class="check-label">Gripper</span>
+            <span class="rep-boxes">
+              <span class="rep-box" data-id="gripper-1"></span>
+              <span class="rep-box" data-id="gripper-2"></span>
+              <span class="rep-box" data-id="gripper-3"></span>
+              <span class="rep-box" data-id="gripper-4"></span>
+              <span class="rep-box" data-id="gripper-5"></span>
+            </span>
+          </li>
           <li class="check-item" data-id="stretch"><span class="check-box"></span><span class="check-label">Stretch</span></li>
           <li class="check-item water-item" data-id="water">
             <span class="check-label">Water</span>
@@ -2845,13 +2891,16 @@
           item.classList.toggle('show', days.includes(todayAbbr));
         }
       });
+      document.querySelectorAll('#daily .rep-box').forEach((box) => {
+        box.classList.toggle('checked', checked.has(box.dataset.id));
+      });
       const waterInput = document.getElementById('waterInput');
       if (waterInput) waterInput.value = sameDay && stored.water ? stored.water : '';
     }
 
     function saveDaily() {
       const today = easternDateStr();
-      const checked = Array.from(document.querySelectorAll('#daily .check-item.checked')).map((i) => i.dataset.id);
+      const checked = Array.from(document.querySelectorAll('#daily .check-item.checked, #daily .rep-box.checked')).map((i) => i.dataset.id);
       const waterInput = document.getElementById('waterInput');
       const water = waterInput ? waterInput.value : '';
       localStorage.setItem(DAILY_KEY, JSON.stringify({ date: today, checked, water }));
@@ -2871,9 +2920,15 @@
     scheduleNextMidnight();
 
     document.getElementById('daily').addEventListener('click', (e) => {
+      const repBox = e.target.closest('.rep-box');
+      if (repBox) {
+        repBox.classList.toggle('checked');
+        saveDaily();
+        return;
+      }
       if (e.target.closest('.water-input')) return;
       const item = e.target.closest('.check-item');
-      if (!item) return;
+      if (!item || item.classList.contains('rep-item')) return;
       item.classList.toggle('checked');
       saveDaily();
     });
