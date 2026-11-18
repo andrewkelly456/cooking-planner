@@ -712,9 +712,9 @@
     <div class="topbar">
       <button type="button" class="hamburger" id="hamburger" aria-label="Menu">☰</button>
       <div class="tabs">
-        <button type="button" class="tab" data-tab="daily">✓</button>
+        <button type="button" class="tab active" data-tab="daily">✓</button>
         <button type="button" class="tab" data-tab="cooking">Cooking</button>
-        <button type="button" class="tab active" data-tab="eating">Eating</button>
+        <button type="button" class="tab" data-tab="eating">Eating</button>
       </div>
     </div>
   </header>
@@ -724,7 +724,7 @@
   </div>
 
   <main class="content">
-    <section class="panel" id="daily" aria-label="Daily checklist">
+    <section class="panel active" id="daily" aria-label="Daily checklist">
       <div class="daily-list">
         <div class="daily-date" id="dailyDate"></div>
         <ul class="check-list">
@@ -2290,7 +2290,7 @@
       </div>
     </section>
 
-    <section class="panel active" id="eating" aria-label="Eating">
+    <section class="panel" id="eating" aria-label="Eating">
     <div class="calendar" data-iso-prefix="2026-06" aria-label="June 2026">
       <div class="cal-cell today">
         <div class="cal-date">Fri 5</div>
@@ -2679,12 +2679,8 @@
     loadCooking();
     refreshAddButtons();
 
-    // Restore whichever view you were on last (defaults to eating).
-    // Deliberately done after loadCooking() so that, if Cooking is the
-    // restored tab, scrollCookingToToday() below measures row heights
-    // that already include today's saved food groups.
-    const saved = localStorage.getItem(TAB_KEY);
-    showView(document.getElementById(saved) ? saved : 'eating');
+    // Always open on the checkmark (daily) tab.
+    showView('daily');
 
     // Scroll so today's day (and its screen-pair partner) sit at the top,
     // instead of always opening on August 1st.
